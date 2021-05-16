@@ -9,6 +9,10 @@ import android.os.Looper;
 import android.os.ParcelUuid;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +21,6 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import no.nordicsemi.android.log.LogSession;
 import no.nordicsemi.android.log.Logger;
 import no.nordicsemi.android.mesh.ApplicationKey;
@@ -54,6 +55,7 @@ import no.nordicsemi.android.mesh.transport.ControlMessage;
 import no.nordicsemi.android.mesh.transport.Element;
 import no.nordicsemi.android.mesh.transport.GenericLevelStatus;
 import no.nordicsemi.android.mesh.transport.GenericOnOffStatus;
+import no.nordicsemi.android.mesh.transport.HXMessage;
 import no.nordicsemi.android.mesh.transport.MeshMessage;
 import no.nordicsemi.android.mesh.transport.MeshModel;
 import no.nordicsemi.android.mesh.transport.ProvisionedMeshNode;
@@ -963,6 +965,11 @@ public class NrfMeshRepository implements MeshProvisioningStatusCallbacks, MeshS
                         final MeshModel model = element.getMeshModels().get(status.getModelIdentifier());
                         mSelectedModel.postValue(model);
                     }
+                }
+            } else if (meshMessage instanceof HXMessage) {
+                if (updateNode(node)) {
+                    final HXMessage hxMessage = (HXMessage) meshMessage;
+                    mMeshMessageLiveData.postValue(hxMessage);
                 }
             }
 

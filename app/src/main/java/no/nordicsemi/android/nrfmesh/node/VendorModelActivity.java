@@ -16,6 +16,7 @@ import no.nordicsemi.android.mesh.models.VendorModel;
 import no.nordicsemi.android.mesh.transport.ConfigVendorModelAppList;
 import no.nordicsemi.android.mesh.transport.ConfigVendorModelSubscriptionList;
 import no.nordicsemi.android.mesh.transport.Element;
+import no.nordicsemi.android.mesh.transport.HXMessage;
 import no.nordicsemi.android.mesh.transport.MeshMessage;
 import no.nordicsemi.android.mesh.transport.MeshModel;
 import no.nordicsemi.android.mesh.transport.VendorModelMessageAcked;
@@ -143,6 +144,10 @@ public class VendorModelActivity extends ModelConfigurationActivity {
             } else {
                 displayStatusDialogFragment(getString(R.string.title_vendor_model_subscription_list), status.getStatusCodeName());
             }
+        } else if (meshMessage instanceof HXMessage) {
+            final HXMessage status = (HXMessage) meshMessage;
+            layoutVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
+            layoutVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getParameters(), false));
         }
         hideProgressBar();
     }

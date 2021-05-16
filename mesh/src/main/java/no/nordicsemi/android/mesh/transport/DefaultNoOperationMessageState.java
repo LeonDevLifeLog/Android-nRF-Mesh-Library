@@ -2,12 +2,13 @@ package no.nordicsemi.android.mesh.transport;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import no.nordicsemi.android.mesh.Features;
 import no.nordicsemi.android.mesh.Group;
 import no.nordicsemi.android.mesh.MeshManagerApi;
@@ -460,6 +461,8 @@ class DefaultNoOperationMessageState extends MeshMessageState {
                     final VendorModelMessageUnacked vendorModelMessageUnacked = (VendorModelMessageUnacked) mMeshMessage;
                     final VendorModelMessageStatus status = new VendorModelMessageStatus(message, vendorModelMessageUnacked.getModelIdentifier());
                     mMeshStatusCallbacks.onMeshMessageReceived(message.getSrc(), status);
+                } else if (message.getOpCode() == HXMessage.HX_MESSAGE_OP_CODE) {
+                    mMeshStatusCallbacks.onMeshMessageReceived(message.getSrc(), new HXMessage(message));
                 } else {
                     handleUnknownPdu(message);
                 }

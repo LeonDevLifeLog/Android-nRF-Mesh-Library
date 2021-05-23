@@ -76,7 +76,7 @@ public class VendorModelActivity extends ModelConfigurationActivity {
                 binding.nodeHxLatestSentContainer.setVisibility(View.VISIBLE);
                 layoutHxLatestSendBinding = LayoutHxQueryLatestSentBinding.inflate(getLayoutInflater(), binding.nodeHxLatestSentContainer, true);
                 layoutHxLatestSendBinding.actionQuery.setOnClickListener(v -> {
-                    layoutVendorModelControlsBinding.receivedMessage.setText("");
+                    layoutHxLatestSendBinding.receivedMessage.setText("");
                     sendVendorModelMessage(0x47 | 0xc0, null, layoutHxVendorModelControlsBinding.chkAcknowledged.isChecked());
                 });
                 binding.nodeHxReceiveContainer.setVisibility(View.VISIBLE);

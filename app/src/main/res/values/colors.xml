@@ -53,11 +53,11 @@
     <color name="colorNordicLogoTop">@color/nordicLightGray</color>
 
     <!-- Nordic colors -->
-    <color name="nordicBlue">#FF00A9CE</color>
-    <color name="nordicBlueDark">#FF0090B0</color>
-    <color name="nordicSky">#FF6AD1E3</color>
+    <color name="nordicBlue">#ec3a1c</color>
+    <color name="nordicBlueDark">#ec3a1c</color>
+    <color name="nordicSky">#ec3a1c</color>
     <color name="nordicBlueSlate">#FF0033A0</color>
-    <color name="nordicLake">#FF0077C8</color>
+    <color name="nordicLake">#ec3a1c</color>
     <color name="nordicLightGray">#FFD9E1E2</color>
     <color name="nordicMediumGray">#FF768692</color>
     <color name="nordicDarkGray">#FF333F48</color>

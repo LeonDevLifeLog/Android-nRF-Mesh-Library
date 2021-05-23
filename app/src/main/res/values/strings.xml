@@ -21,7 +21,7 @@
   -->
 
 <resources>
-    <string name="app_name">nRF Mesh</string>
+    <string name="app_name">HX Mesh</string>
     <string name="feature_name">Mesh</string>
     <string name="title_scanner">Scanner</string>
     <string name="sub_title_scanning_nodes">Looking for unprovisioned proxy nodes…</string>
@@ -395,10 +395,16 @@
     <string name="unknown">Unknown</string>
 
     <string name="title_vendor_model_controls">Vendor Model Controls</string>
+    <string name="title_hx_vendor_model_controls">HX Vendor Model Controls</string>
+    <string name="title_hx_receive_container">HX Vendor Model RX</string>
+    <string name="title_hx_latest_sent_container">HX Vendor Model Latest Sent</string>
     <string name="opcode">Opcode without company id</string>
     <string name="parameters">Parameters</string>
+    <string name="text_parameters">Parameters(text)</string>
     <string name="received_message">Received message:</string>
+    <string name="latest_sent_message">Latest sent message:</string>
     <string name="action_send">Send</string>
+    <string name="action_query">Query</string>
     <string name="error_empty_value">Value cannot be empty</string>
     <string name="message_type">Acknowledged Message</string>
     <string name="enforce_vendor_op_code">0xC0 | 0x</string>
@@ -672,4 +678,5 @@
         If the Mesh Proxy Service is exposed, the node can be configured to advertise with Node Identity on a subnet.</string>
     <string name="title_sensor_information">Sensor Information</string>
     <string name="error_empty_scene_name">Error empty scene name</string>
+    <string name="op_code_74">74</string>
 </resources>

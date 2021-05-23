@@ -33,6 +33,7 @@ android {
         targetSdkVersion 30
         versionCode 80
         versionName VERSION_NAME
+        applicationIdSuffix '.hx'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -87,9 +88,10 @@ dependencies {
     annotationProcessor "com.google.dagger:hilt-android-compiler:$hilt_version"
     annotationProcessor 'androidx.hilt:hilt-compiler:1.0.0-beta01'
 
-    implementation 'no.nordicsemi.android:mesh:3.1.5'
-    //implementation project(':mesh')
+//    implementation 'no.nordicsemi.android:mesh:3.1.5'
+    implementation project(':mesh')
 }
 repositories {
     mavenCentral()
+    google()
 }

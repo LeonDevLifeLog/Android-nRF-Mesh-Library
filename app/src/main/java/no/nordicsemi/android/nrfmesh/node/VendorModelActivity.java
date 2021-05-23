@@ -24,6 +24,9 @@ import no.nordicsemi.android.mesh.transport.VendorModelMessageStatus;
 import no.nordicsemi.android.mesh.transport.VendorModelMessageUnacked;
 import no.nordicsemi.android.mesh.utils.MeshParserUtils;
 import no.nordicsemi.android.nrfmesh.R;
+import no.nordicsemi.android.nrfmesh.databinding.LayoutHxQueryLatestSentBinding;
+import no.nordicsemi.android.nrfmesh.databinding.LayoutHxReceiveContainerBinding;
+import no.nordicsemi.android.nrfmesh.databinding.LayoutHxVendorModelControlsBinding;
 import no.nordicsemi.android.nrfmesh.databinding.LayoutVendorModelControlsBinding;
 import no.nordicsemi.android.nrfmesh.utils.HexKeyListener;
 import no.nordicsemi.android.nrfmesh.utils.Utils;
@@ -33,6 +36,9 @@ import no.nordicsemi.android.nrfmesh.utils.Utils;
 public class VendorModelActivity extends ModelConfigurationActivity {
 
     private LayoutVendorModelControlsBinding layoutVendorModelControlsBinding;
+    private LayoutHxVendorModelControlsBinding layoutHxVendorModelControlsBinding;
+    private LayoutHxReceiveContainerBinding layoutHxReceiveContainerBinding;
+    private LayoutHxQueryLatestSentBinding layoutHxLatestSendBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +46,50 @@ public class VendorModelActivity extends ModelConfigurationActivity {
         mSwipe.setOnRefreshListener(this);
         final MeshModel model = mViewModel.getSelectedModel().getValue();
         if (model instanceof VendorModel) {
+            if (model.getModelId() == 0x00590003) {
+                layoutHxVendorModelControlsBinding = LayoutHxVendorModelControlsBinding
+                        .inflate(getLayoutInflater(), binding.nodeControlsContainer, true);
+                layoutHxVendorModelControlsBinding.chkAcknowledged.setOnCheckedChangeListener((buttonView, isChecked) -> layoutHxVendorModelControlsBinding.opCode.setText(isChecked ? "54" : "74"));
+                layoutHxVendorModelControlsBinding.actionSend.setOnClickListener(v -> {
+                    layoutHxVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.GONE);
+                    layoutHxVendorModelControlsBinding.receivedMessage.setText("");
+                    final String opCode = layoutHxVendorModelControlsBinding.opCode.getEditableText().toString().trim();
+                    final String parameters = layoutHxVendorModelControlsBinding.parameters.getEditableText().toString().trim();
+
+                    if (!validateOpcode(opCode, layoutHxVendorModelControlsBinding.opCodeLayout))
+                        return;
+
+                    if (model.getBoundAppKeyIndexes().isEmpty()) {
+                        Toast.makeText(this, R.string.no_app_keys_bound, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    final byte[] params;
+                    if (TextUtils.isEmpty(parameters) && parameters.length() == 0) {
+                        params = null;
+                    } else {
+                        params = parameters.getBytes();
+                    }
+
+                    sendVendorModelMessage(Integer.parseInt(opCode, 16), params, layoutHxVendorModelControlsBinding.chkAcknowledged.isChecked());
+                });
+                binding.nodeHxLatestSentContainer.setVisibility(View.VISIBLE);
+                layoutHxLatestSendBinding = LayoutHxQueryLatestSentBinding.inflate(getLayoutInflater(), binding.nodeHxLatestSentContainer, true);
+                layoutHxLatestSendBinding.actionQuery.setOnClickListener(v -> {
+                    layoutVendorModelControlsBinding.receivedMessage.setText("");
+                    sendVendorModelMessage(0x47 | 0xc0, null, layoutHxVendorModelControlsBinding.chkAcknowledged.isChecked());
+                });
+                binding.nodeHxReceiveContainer.setVisibility(View.VISIBLE);
+                layoutHxReceiveContainerBinding = LayoutHxReceiveContainerBinding.inflate(getLayoutInflater(), binding.nodeHxReceiveContainer, true);
+                mViewModel.getSelectedModel().observe(this, meshModel -> {
+                    if (meshModel != null) {
+                        updateAppStatusUi(meshModel);
+                        updatePublicationUi(meshModel);
+                        updateSubscriptionUi(meshModel);
+                    }
+                });
+                return;
+            }
             layoutVendorModelControlsBinding =
                     LayoutVendorModelControlsBinding.inflate(getLayoutInflater(), binding.nodeControlsContainer, true);
             final KeyListener hexKeyListener = new HexKeyListener();
@@ -126,8 +176,26 @@ public class VendorModelActivity extends ModelConfigurationActivity {
         super.updateMeshMessage(meshMessage);
         if (meshMessage instanceof VendorModelMessageStatus) {
             final VendorModelMessageStatus status = (VendorModelMessageStatus) meshMessage;
-            layoutVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
-            layoutVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getAccessPayload(), false));
+            if (layoutVendorModelControlsBinding != null) {
+                layoutVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
+                layoutVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getAccessPayload(), false));
+            }
+            if (layoutHxVendorModelControlsBinding != null) {
+                layoutHxVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
+                layoutHxVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getParameters(), false));
+            }
+            if (status.getOpCode() == 0xF45900) {
+                if (layoutHxReceiveContainerBinding == null) {
+                    return;
+                }
+                layoutHxReceiveContainerBinding.receivedMessage.setText(new String(status.getParameters()));
+            }
+            if (status.getOpCode() == 0xD25900) {
+                if (layoutHxLatestSendBinding == null) {
+                    return;
+                }
+                layoutHxLatestSendBinding.receivedMessage.setText(new String(status.getParameters()));
+            }
         } else if (meshMessage instanceof ConfigVendorModelAppList) {
             final ConfigVendorModelAppList status = (ConfigVendorModelAppList) meshMessage;
             mViewModel.removeMessage();
@@ -145,9 +213,12 @@ public class VendorModelActivity extends ModelConfigurationActivity {
                 displayStatusDialogFragment(getString(R.string.title_vendor_model_subscription_list), status.getStatusCodeName());
             }
         } else if (meshMessage instanceof HXMessage) {
+            if (layoutHxVendorModelControlsBinding == null) {
+                return;
+            }
             final HXMessage status = (HXMessage) meshMessage;
-            layoutVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
-            layoutVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getParameters(), false));
+            layoutHxVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
+            layoutHxVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getParameters(), false));
         }
         hideProgressBar();
     }
@@ -239,6 +310,7 @@ public class VendorModelActivity extends ModelConfigurationActivity {
                 } else {
                     sendMessage(element.getElementAddress(),
                             new VendorModelMessageUnacked(appKey, model.getModelId(), model.getCompanyIdentifier(), opcode, parameters));
+                    hideProgressBar();
                 }
             }
         }

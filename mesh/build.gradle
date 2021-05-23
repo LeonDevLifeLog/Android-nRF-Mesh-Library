@@ -75,6 +75,7 @@ dependencies {
 }
 repositories {
     mavenCentral()
+    google()
 }
 
 //apply from: rootProject.file('gradle/gradle-bintray-push.gradle')

@@ -180,17 +180,31 @@ public class VendorModelActivity extends ModelConfigurationActivity {
                 layoutVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
                 layoutVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getAccessPayload(), false));
             }
-            if (layoutHxVendorModelControlsBinding != null) {
+            //接收到透传过去数据的应答消息
+            if (status.getOpCode() >>> (4 * 4) == (0x06 | 0xc0)) {
+                if (layoutHxVendorModelControlsBinding == null) {
+                    return;
+                }
                 layoutHxVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
-                layoutHxVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getParameters(), false));
+                layoutHxVendorModelControlsBinding.receivedMessage.setText(new String(status.getParameters()));
             }
-            if (status.getOpCode() == 0xF45900) {
+            //接收到透传消息，需要应答
+            if (status.getOpCode() >>> (4 * 4) == (0x54 | 0xc0)) {
+                if (layoutHxReceiveContainerBinding == null) {
+                    return;
+                }
+                layoutHxReceiveContainerBinding.receivedMessage.setText(new String(status.getParameters()));
+                sendVendorModelMessage(0x06 | 0xc0, null, false);
+            }
+            //接收到透传消息，不需要应答
+            if (status.getOpCode() >>> (4 * 4) == (0x74 | 0xc0)) {
                 if (layoutHxReceiveContainerBinding == null) {
                     return;
                 }
                 layoutHxReceiveContainerBinding.receivedMessage.setText(new String(status.getParameters()));
             }
-            if (status.getOpCode() == 0xD25900) {
+            //接收到上次透传过去的数据
+            if (status.getOpCode() >>> (4 * 4) == (0x52 | 0xc0)) {
                 if (layoutHxLatestSendBinding == null) {
                     return;
                 }

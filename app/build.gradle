@@ -32,9 +32,8 @@ android {
         minSdkVersion 18
         targetSdkVersion 30
         versionCode 80
-        versionName VERSION_NAME
+        versionName HX_VERSION_NAME
         applicationIdSuffix '.hx'
-        versionNameSuffix ' for hx v0.1'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true

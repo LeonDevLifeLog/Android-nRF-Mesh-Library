@@ -157,7 +157,7 @@ public class SettingsFragment extends Fragment implements
         final TextView version = containerVersion.text;
         version.setVisibility(View.VISIBLE);
         try {
-            version.setText(requireContext().getPackageManager().getPackageInfo(requireContext().getPackageName(), 0).versionName);
+            version.setText("HX V"+requireContext().getPackageManager().getPackageInfo(requireContext().getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

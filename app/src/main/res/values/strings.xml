@@ -21,7 +21,7 @@
   -->
 
 <resources>
-    <string name="app_name">HX Mesh</string>
+    <string name="app_name">BLE Mesh调试工具</string>
     <string name="feature_name">Mesh</string>
     <string name="title_scanner">Scanner</string>
     <string name="sub_title_scanning_nodes">Looking for unprovisioned proxy nodes…</string>
@@ -43,8 +43,9 @@
     <string name="bluetooth_disabled_action">Enable</string>
 
     <string name="unprovisioned_node_guide_title">CAN\'T SEE YOUR NODE?</string>
-    <string name="unprovisioned_node_guide_info">1. Make sure the DK is <b>turned on</b> and is connected to a power source using a micro USB cable or a coin cell is plugged in.
-        \n\n2. Make sure the <b>relevant</b> firmware and SoftDevice are flashed.</string>
+    <string name="unprovisioned_node_guide_info">1. 请确定使用了红旭无线推出的带AT MESH 透传程序的硬件模组详情访问http://www.wireless-tech.cn\n
+        2. 请确认硬件模组没有加入其它的MESH网络，如果不确定，请使用AT+RESET=1\\r\\n 指令。\n
+        3. 更多技术支持加入QQ群：711478146</string>
     <string name="unprovisioned_node_guide_location_info">3. Location is turned off. Some Android phones require it enabled in order to scan for Bluetooth LE devices.
 		If you are sure your Node is advertising and it doesn\'t show up here, click the button below to enable Location.</string>
     <string name="unprovisioned_node_guide_location_action">Enable</string>
@@ -191,7 +192,8 @@
     <string name="action_proxy">Proxy Filter</string>
     <string name="action_settings">Settings</string>
     <string name="no_nodes_provisioned_title">NO NODES PROVISIONED</string>
-    <string name="no_nodes_provisioned_rationale">Add a mesh node by scanning and provisioning the device.</string>
+    <string name="no_nodes_provisioned_rationale">Add a mesh node by scanning and provisioning the device.\n
+        该APP的串口透传配套的硬件请访问红旭无线官网：http://www.wireless-tech.cn 购买</string>
 
     <string name="no_groups_configured_title">NO GROUPS CONFIGURED</string>
     <string name="no_groups_configured_rationale">Create a group to control your devices. All groups listed here can be subscribed to from a model.</string>

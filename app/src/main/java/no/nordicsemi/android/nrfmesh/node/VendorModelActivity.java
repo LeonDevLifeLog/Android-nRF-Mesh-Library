@@ -174,41 +174,46 @@ public class VendorModelActivity extends ModelConfigurationActivity {
     @Override
     protected void updateMeshMessage(final MeshMessage meshMessage) {
         super.updateMeshMessage(meshMessage);
-        if (meshMessage instanceof VendorModelMessageStatus) {
-            final VendorModelMessageStatus status = (VendorModelMessageStatus) meshMessage;
-            if (layoutVendorModelControlsBinding != null) {
-                layoutVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
-                layoutVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getAccessPayload(), false));
+        if (meshMessage instanceof HXMessage) {
+            if (layoutHxVendorModelControlsBinding == null) {
+                return;
             }
-            //接收到透传过去数据的应答消息
-            if (status.getOpCode() >>> (4 * 4) == (0x06 | 0xc0)) {
+            final HXMessage status = (HXMessage) meshMessage;
+            //接收到透传过去数据的应答消息 0x06 | 0xc0 = 0xc6
+            if (status.getOpCode() == HXMessage.OP_CODE_SERVER_ACK) {
                 if (layoutHxVendorModelControlsBinding == null) {
                     return;
                 }
                 layoutHxVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
                 layoutHxVendorModelControlsBinding.receivedMessage.setText(new String(status.getParameters()));
             }
-            //接收到透传消息，需要应答
-            if (status.getOpCode() >>> (4 * 4) == (0x54 | 0xc0)) {
+            //接收到透传消息，需要应答 0x54 | 0xc0 =0xd4
+            if (status.getOpCode() == HXMessage.OP_CODE_CLIENT_SEND) {
                 if (layoutHxReceiveContainerBinding == null) {
                     return;
                 }
                 layoutHxReceiveContainerBinding.receivedMessage.setText(new String(status.getParameters()));
                 sendVendorModelMessage(0x06 | 0xc0, null, false);
             }
-            //接收到透传消息，不需要应答
-            if (status.getOpCode() >>> (4 * 4) == (0x74 | 0xc0)) {
+            //接收到透传消息，不需要应答 0x74 | 0xc0 = 0xf4
+            if (status.getOpCode() == HXMessage.OP_CODE_CLIENT_SEND_WITHOUT_ACK) {
                 if (layoutHxReceiveContainerBinding == null) {
                     return;
                 }
                 layoutHxReceiveContainerBinding.receivedMessage.setText(new String(status.getParameters()));
             }
-            //接收到上次透传过去的数据
-            if (status.getOpCode() >>> (4 * 4) == (0x52 | 0xc0)) {
+            //接收到上次透传过去的数据 0x52 | 0xc0 = 0xd2
+            if (status.getOpCode() == HXMessage.OP_CODE_SERVER_LATEST_RECEIVED) {
                 if (layoutHxLatestSendBinding == null) {
                     return;
                 }
                 layoutHxLatestSendBinding.receivedMessage.setText(new String(status.getParameters()));
+            }
+        } else if (meshMessage instanceof VendorModelMessageStatus) {
+            final VendorModelMessageStatus status = (VendorModelMessageStatus) meshMessage;
+            if (layoutVendorModelControlsBinding != null) {
+                layoutVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
+                layoutVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getAccessPayload(), false));
             }
         } else if (meshMessage instanceof ConfigVendorModelAppList) {
             final ConfigVendorModelAppList status = (ConfigVendorModelAppList) meshMessage;
@@ -226,13 +231,6 @@ public class VendorModelActivity extends ModelConfigurationActivity {
             } else {
                 displayStatusDialogFragment(getString(R.string.title_vendor_model_subscription_list), status.getStatusCodeName());
             }
-        } else if (meshMessage instanceof HXMessage) {
-            if (layoutHxVendorModelControlsBinding == null) {
-                return;
-            }
-            final HXMessage status = (HXMessage) meshMessage;
-            layoutHxVendorModelControlsBinding.receivedMessageContainer.setVisibility(View.VISIBLE);
-            layoutHxVendorModelControlsBinding.receivedMessage.setText(MeshParserUtils.bytesToHex(status.getParameters(), false));
         }
         hideProgressBar();
     }

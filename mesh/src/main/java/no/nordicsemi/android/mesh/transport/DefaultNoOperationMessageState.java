@@ -452,7 +452,13 @@ class DefaultNoOperationMessageState extends MeshMessageState {
                 }
                 break;
             case 3:
-                if (mMeshMessage instanceof VendorModelMessageAcked) {
+                if (message.getOpCode() == HXMessage.OP_CODE_CLIENT_SEND ||
+                        message.getOpCode() == HXMessage.OP_CODE_CLIENT_SEND_WITHOUT_ACK ||
+                        message.getOpCode() == HXMessage.OP_CODE_CLIENT_QUERY_LATEST_SENT ||
+                        message.getOpCode() == HXMessage.OP_CODE_SERVER_ACK ||
+                        message.getOpCode() == HXMessage.OP_CODE_SERVER_LATEST_RECEIVED) {
+                    mMeshStatusCallbacks.onMeshMessageReceived(message.getSrc(), new HXMessage(message));
+                } else if (mMeshMessage instanceof VendorModelMessageAcked) {
                     final VendorModelMessageAcked vendorModelMessageAcked = (VendorModelMessageAcked) mMeshMessage;
                     final VendorModelMessageStatus status = new VendorModelMessageStatus(message, vendorModelMessageAcked.getModelIdentifier());
                     mMeshStatusCallbacks.onMeshMessageReceived(message.getSrc(), status);
@@ -461,8 +467,6 @@ class DefaultNoOperationMessageState extends MeshMessageState {
                     final VendorModelMessageUnacked vendorModelMessageUnacked = (VendorModelMessageUnacked) mMeshMessage;
                     final VendorModelMessageStatus status = new VendorModelMessageStatus(message, vendorModelMessageUnacked.getModelIdentifier());
                     mMeshStatusCallbacks.onMeshMessageReceived(message.getSrc(), status);
-                } else if (message.getOpCode() == HXMessage.HX_MESSAGE_OP_CODE) {
-                    mMeshStatusCallbacks.onMeshMessageReceived(message.getSrc(), new HXMessage(message));
                 } else {
                     handleUnknownPdu(message);
                 }
